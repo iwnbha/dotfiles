@@ -1,8 +1,8 @@
 [policy]
 version = 1
-family = "MonoLisaCode Variable-cv04-cv08-ss03-ss07-ss11"
+family = "MonoLisaCode"
 delivery = "customizer-font-build"
-source = "MonoLisa customizer red selections"
+source = "MonoLisaCode.zip (MonoLisaCodeUpright.ttf, MonoLisaCodeItalic.ttf)"
 
 enabled = ["calt", "liga", "cv04", "cv08", "ss03", "ss07", "ss11"]
 
@@ -42,8 +42,9 @@ required_glyphs = [
   "asterisk.ss07",
   "braceleft.ss11",
   "braceright.ss11",
+  "equal_equal_equal.liga",
 ]
-forbidden_glyphs = ["equal_equal_equal.liga", "zero.zero"]
+forbidden_glyphs = ["zero.zero"]
 
 [probe.italic]
 text = "<-> -> * {} === 0"
@@ -53,5 +54,6 @@ required_glyphs = [
   "asterisk.ss07",
   "braceleft.ss11",
   "braceright.ss11",
+  "equal_equal_equal.liga",
 ]
-forbidden_glyphs = ["equal_equal_equal.liga", "zero.zero"]
+forbidden_glyphs = ["zero.zero"]

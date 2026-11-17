@@ -21,7 +21,7 @@ Dev Container 使用 `CHEZMOI_PROFILE=devcontainer` 和独立的 `devcontainer.B
 - `.zshenv` 只定义 XDG Base Directory；`~/.config/zsh/homebrew.zsh` 是 Homebrew PATH/FPATH 的唯一所有者，由 `.zprofile` 与 `.zshrc` 共同加载且不执行启动期子进程；`.zshrc` 其余部分只处理交互功能。
 - Starship、Atuin、fzf、direnv、zoxide 与 Carapace 每次按当前命令、参数与环境直接初始化；Zsh 补全缓存仍保留。
 - Starship 使用 Quiet Ops Prompt：默认只显示目录、Git 状态和低频高价值反馈；语言、构建工具、包版本、Python 环境、容器、Docker context 与 Kubernetes 保持静默。非零退出只将输入箭头变红，后台任务数与超过 2 秒的命令耗时显示在第二行右侧。
-- Ghostty 固定使用 Catppuccin Mocha 暗色主题；MonoLisa customizer 输出的 `MonoLisaCode Variable-cv04-cv08-ss03-ss07-ss11` 变量字体负责拉丁文字与真实字重/斜体，PingFang SC 负责中文，Maple Mono NF CN 是 Nerd Font 图标的首选 fallback，`Symbols Nerd Font Mono` 保留为单字符宽度末级兜底，并提供 GPU 渲染和原生分屏。
+- Ghostty 固定使用 Catppuccin Mocha 暗色主题；授权字体包中的 `MonoLisaCode` 变量字体负责拉丁文字与真实字重/斜体，PingFang SC 负责中文，Maple Mono NF CN 是 Nerd Font 图标的首选 fallback，`Symbols Nerd Font Mono` 保留为单字符宽度末级兜底，并提供 GPU 渲染和原生分屏。
 - Zellij 默认处于 locked mode，避免在 macOS 和 Linux 上占用 Shell、Neovim 的 Alt 快捷键。
 - Zsh 新安装将原生历史持久化到 `$XDG_STATE_HOME/zsh/history`，已有旧历史时保留兼容路径（见 XDG 目录策略）；Atuin 独占 `Ctrl-R` 并负责加密同步，选中命令只回填供复核，fzf 仅管理 `Ctrl-T/Alt-C`。
 - Neovim 是唯一编辑器；Git、Yazi、sudo、systemd 与 kubectl 的编辑入口统一指向 Neovim。
@@ -507,9 +507,9 @@ Neotest 的 Run Last、测试摘要与测试调试按测试所属项目选择解
 
 ### Ghostty（macOS）与 Zellij（macOS/Linux）
 
-Ghostty 固定使用 Catppuccin Mocha 暗色主题，并使用职责明确的字体栈：MonoLisa customizer 输出的 `MonoLisaCode Variable-cv04-cv08-ss03-ss07-ss11` 变量字体负责拉丁文字、代码、字重与斜体，PingFang SC 负责中文，Maple Mono NF CN 是 Nerd Font 图标的首选 fallback，`Symbols Nerd Font Mono` 保留为单字符宽度末级符号兜底。默认字面使用 MonoLisa 原生 `wght=600 / GRAD=25`，ANSI 强调使用 `wght=800 / GRAD=25`，斜体由独立 Italic 字形文件提供并使用相同的对应端点。OpenType 偏好记录在 `fonts/monolisa-opentype.toml`：启用标准/上下文连字、`cv04` 往返箭头、`cv08` 箭头、`ss03` 直立体 alternate g、`ss07` traditional `*` 与 `ss11` alternate braces；禁用 discretionary coding ligatures、slashed zero，以及其余 alternates。该策略由 MonoLisa customizer 固化到用户授权字体，并通过 `tests/fonts/test_monolisa_manifest.py --upright <font> --italic <font>` 验证；Ghostty 1.3 的 feature 会作用于全部 fallback，因此终端配置不直接设置 `font-feature`。配置同时关闭字体增重和合成字形，不额外缩放图标；fallback 仅按缺字与配置顺序发生，不按 Git、Prompt 或 Neovim 等语义强制分配，也不维护脆弱的码点映射。MonoLisa 字体文件不进入本仓库；Maple 与 Symbols Nerd Font 由 Brewfile 管理。终端同时提供透明模糊背景、10 万行回滚、剪贴板读取确认和失焦窗口长命令完成通知。Zellij 保留会话结构恢复，但不把 Pane 可见内容序列化到缓存。
+Ghostty 固定使用 Catppuccin Mocha 暗色主题，并使用职责明确的字体栈：授权字体包中的 `MonoLisaCode` 变量字体负责拉丁文字、代码、字重与斜体，PingFang SC 负责中文，Maple Mono NF CN 是 Nerd Font 图标的首选 fallback，`Symbols Nerd Font Mono` 保留为单字符宽度末级符号兜底。默认字面使用 MonoLisa 原生 `wght=600 / GRAD=25`，ANSI 强调使用 `wght=800 / GRAD=25`，斜体由独立 Italic 字形文件提供并使用相同的对应端点。OpenType 偏好记录在 `fonts/monolisa-opentype.toml`：启用标准/上下文连字、`cv04` 往返箭头、`cv08` 箭头、`ss03` 直立体 alternate g、`ss07` traditional `*` 与 `ss11` alternate braces；新包的标准连字（`liga`）包含 `===`，默认即可连写；`dlig`、斜线零和其余 alternates 默认关闭。该策略由 MonoLisa customizer 固化到用户授权字体，并通过 `tests/fonts/test_monolisa_manifest.py --upright <font> --italic <font>` 验证；Ghostty 1.3 的 feature 会作用于全部 fallback，因此终端配置不直接设置 `font-feature`。配置同时关闭字体增重和合成字形，不额外缩放图标；fallback 仅按缺字与配置顺序发生，不按 Git、Prompt 或 Neovim 等语义强制分配，也不维护脆弱的码点映射。MonoLisa 字体文件不进入本仓库；Maple 与 Symbols Nerd Font 由 Brewfile 管理。终端同时提供透明模糊背景、10 万行回滚、剪贴板读取确认和失焦窗口长命令完成通知。Zellij 保留会话结构恢复，但不把 Pane 可见内容序列化到缓存。
 
-Ghostty 标题文字同样使用授权的 MonoLisa customizer family；保留 macOS 红黄绿窗口按钮，隐藏只能显示或关闭、无法自定义的当前目录代理文件夹图标。
+Ghostty 标题文字同样使用`MonoLisaCode` 字体家族；保留 macOS 红黄绿窗口按钮，隐藏只能显示或关闭、无法自定义的当前目录代理文件夹图标。
 
 | 平台与程序 | 快捷键 | 功能 |
 | --- | --- | --- |

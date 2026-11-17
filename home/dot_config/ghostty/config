@@ -8,7 +8,7 @@
 theme = "Catppuccin Mocha"
 # Independent fallback layers keep code, CJK, and private-use icons diagnosable
 # without patching the licensed MonoLisa font files.
-font-family = "MonoLisaCode Variable-cv04-cv08-ss03-ss07-ss11"
+font-family = "MonoLisaCode"
 font-family = "PingFang SC"
 font-family = "Maple Mono NF CN"
 font-family = "Symbols Nerd Font Mono"
@@ -39,7 +39,7 @@ background-blur-radius = 12
 window-padding-x = 14
 window-padding-y = 14
 window-decoration = true
-window-title-font-family = "MonoLisaCode Variable-cv04-cv08-ss03-ss07-ss11"
+window-title-font-family = "MonoLisaCode"
 unfocused-split-opacity = 0.75
 
 # 2. 窗口行为与光标样式
