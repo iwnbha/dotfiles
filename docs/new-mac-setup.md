@@ -59,7 +59,7 @@ pbcopy < ~/.ssh/keys/git_signing.pub
 ## 4. 预览并完整部署 dotfiles
 
 ```sh
-chezmoi init https://github.com/snkio027/dotfiles
+chezmoi init https://github.com/iwnbha/dotfiles
 ```
 
 按提示填写**个人 Git 姓名**与**已在个人 GitHub 账户验证的邮箱**。先预览，再执行完整部署：

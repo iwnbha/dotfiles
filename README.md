@@ -8,7 +8,7 @@
 
 ![Ghostty 中的 Neovim 编辑 Zig SPSC 队列：紫色关键字、蓝色命名空间、橙色调用、青色类型与粉色成员](docs/images/neovim-zig-2026-09-13.png)
 
-*2026-09-13 本机实拍：macOS · Ghostty · Neovim · Zig / ZLS。截图采用[关键字紫色、命名空间蓝色的本机预览（PR #63）](https://github.com/snkio027/dotfiles/pull/63)，不代表该预览已合入主线。*
+*2026-09-13 本机实拍：macOS · Ghostty · Neovim · Zig / ZLS。截图采用关键字紫色、命名空间蓝色的本机预览，见[随后合入主线的配色提交](https://github.com/iwnbha/dotfiles/commit/7fb31ea943b637bffa33b39f521ec64dc67dcd5f)。*
 
 MonoLisa 为用户自行安装的授权字体，字号 `17.5` 是本机显示设置下的个人选择，不是跨设备推荐值；仓库不分发 MonoLisa 字体文件或桌面壁纸。其他机器的字体、缩放与显示设置会影响实际观感。
 
@@ -33,7 +33,7 @@ macOS 工作站默认用 Proton Pass 桌面应用连接 GitHub 并为 Git 提交
 已有 chezmoi 时，分步检查并部署：
 
 ```bash
-chezmoi init https://github.com/snkio027/dotfiles
+chezmoi init https://github.com/iwnbha/dotfiles
 chezmoi diff --no-pager
 chezmoi apply
 ```
@@ -118,7 +118,7 @@ scripts/               Rust provisioning、CI 分类与供应链校验
 docs/                  操作手册与实机效果图；不部署到日用目录
 ```
 
-[GitHub Actions](https://github.com/snkio027/dotfiles/actions/workflows/ci.yml) 按变更路径选择已有门禁：模板与 Shell 检查、安装 profile、macOS 渲染、Locked Neovim Cold Start 和 Dev Container Lifecycle。被跳过的任务不算已执行；CI 通过也不替代实机的视觉、字体与交互验收。
+[GitHub Actions](https://github.com/iwnbha/dotfiles/actions/workflows/ci.yml) 按变更路径选择已有门禁：模板与 Shell 检查、安装 profile、macOS 渲染、Locked Neovim Cold Start 和 Dev Container Lifecycle。被跳过的任务不算已执行；CI 通过也不替代实机的视觉、字体与交互验收。
 
 `main` 使用 [Main Merge Gate](docs/operations.md#主线合并门禁)：必跑任务必须实际成功，明确不适用才允许跳过；失败、取消和缺失证据均阻止合并。规则要求 PR 与最新主线验证，不要求外部审批。
 

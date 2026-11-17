@@ -7,7 +7,7 @@
 ## 初始化
 
 ```bash
-chezmoi init --apply https://github.com/snkio027/dotfiles
+chezmoi init --apply https://github.com/iwnbha/dotfiles
 ```
 
 初始化会询问 Git 姓名和邮箱，安装 Homebrew/Linuxbrew，并按机器类型安装 `workstation` 或 `devcontainer` profile 的缺失依赖，配置 SSH 签名与 gitleaks hook；macOS workstation 还会安装 Ghostty 并应用键盘、Finder、Dock 和截图偏好。日常 `chezmoi apply` 不更新 Homebrew 元数据、不主动批量升级已安装工具，也不会因 Ghostty 配置变化而重新应用 macOS defaults；安装新依赖所必需的依赖链升级仍由 Homebrew 决定，Homebrew 全量更新由 `brewup` 显式触发。Linux 使用现有终端模拟器，只部署跨平台的 Shell、TUI 与 Neovim 配置。macOS 工作站使用 Proton Pass 桌面应用中的个人 SSH key，首次部署按[SSH 与提交签名](#ssh-与提交签名)准备公钥。Linux 工作站在终端创建本地长期 SSH key 时需设置口令。
@@ -288,7 +288,7 @@ git archive --format=tar.gz \
 
 GitHub 原生规则的受审定义在 [main-ruleset.json](../.github/main-ruleset.json)：只保护 `refs/heads/main`，要求 PR、最新 base 上的 `Main Merge Gate`，并绑定实际 GitHub Actions App（ID `15368`）。禁止强推和删除，无 bypass actor；审批人数为 **0**，不要求 CODEOWNERS 或最后推送者之外的人批准。管理员仍能修改规则，因此这是日常合并约束，不是抵御仓库管理员的安全边界。
 
-规则不是通过 chezmoi 或 CI 自动写入的。首次启用前，先让包含门禁的 PR 精确 Head 通过；确认仓库没有冲突规则后，用 `gh api --method POST repos/snkio027/dotfiles/rulesets --input .github/main-ruleset.json` 创建并读取核对。以后先列出规则 ID，再以同一文件 `PUT /repos/snkio027/dotfiles/rulesets/<id>` 更新，不重复创建。启用后正常合并，不使用绕过；若 main 前进，应更新分支并重新验收。维护故障与 PR 门禁分开报告；重跑必须绑定同一 SHA，不能用旧 Head 的绿灯代替新代码验证。
+规则不是通过 chezmoi 或 CI 自动写入的。首次启用前，先让包含门禁的 PR 精确 Head 通过；确认仓库没有冲突规则后，用 `gh api --method POST repos/iwnbha/dotfiles/rulesets --input .github/main-ruleset.json` 创建并读取核对。以后先列出规则 ID，再以同一文件 `PUT /repos/iwnbha/dotfiles/rulesets/<id>` 更新，不重复创建。启用后正常合并，不使用绕过；若 main 前进，应更新分支并重新验收。维护故障与 PR 门禁分开报告；重跑必须绑定同一 SHA，不能用旧 Head 的绿灯代替新代码验证。
 
 回归入口是 `python3 tests/ci/test_merge_gate.py`（Python 标准库；工作流结构检查复用现有 Ruby YAML）。它覆盖任务矩阵、合法/非法跳过、分类失败、失败/取消、缺失与异常输入、真实 CLI 非零退出，以及工作流与规则定义的一致性。不部署日用配置，也不执行待运行的 chezmoi 脚本。
 
