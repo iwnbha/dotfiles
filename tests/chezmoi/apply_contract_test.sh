@@ -17,6 +17,27 @@ BREW_TEST_PREFIX="$TEST_ROOT/linuxbrew"
 LINUX_WORKSTATION_DATA='{"is_mac":false,"is_linux":true,"is_arm64":false,"machine_profile":"workstation"}'
 LINUX_DEVCONTAINER_DATA='{"is_mac":false,"is_linux":true,"is_arm64":false,"machine_profile":"devcontainer"}'
 
+# Personal workspaces contain untracked user files, including private material.
+workspace_home="$TEST_ROOT/workspace-home"
+workspace="$workspace_home/Workspace"
+mkdir -p "$workspace_home"
+workspace_chezmoi=(chezmoi --source "$REPO_ROOT" --destination "$workspace_home"
+    --persistent-state "$TEST_ROOT/workspace-state.boltdb" --override-data "$LINUX_WORKSTATION_DATA" --no-tty)
+"${workspace_chezmoi[@]}" apply "$workspace"
+for name in projects lab data archive vault; do
+    [[ -d "$workspace/$name" ]]
+    [[ -z "$(find "$workspace/$name" -mindepth 1 -print)" ]]
+done
+[[ -n "$(find "$workspace/vault" -prune -perm 0700 -print)" ]]
+
+mkdir "$workspace/other"
+printf 'existing project\n' >"$workspace/other/notes"
+printf 'private data\n' >"$workspace/vault/notes"
+"${workspace_chezmoi[@]}" apply "$workspace"
+[[ "$(cat "$workspace/other/notes")" == 'existing project' ]]
+[[ "$(cat "$workspace/vault/notes")" == 'private data' ]]
+[[ -z "$("${workspace_chezmoi[@]}" status "$workspace")" ]]
+
 chezmoi execute-template --source="$REPO_ROOT" \
     --override-data "$LINUX_WORKSTATION_DATA" \
     <"$BREW_TEMPLATE" >"$BREW_SCRIPT"

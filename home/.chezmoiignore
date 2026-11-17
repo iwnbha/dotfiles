@@ -7,3 +7,7 @@ scratch/
 {{ if not (and .is_mac (eq .machine_profile "workstation")) -}}
 .local/bin/git-ssh-sign-proton
 {{ end -}}
+
+{{ if eq .machine_profile "devcontainer" -}}
+Workspace
+{{ end -}}

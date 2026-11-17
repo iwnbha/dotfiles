@@ -95,11 +95,9 @@ git -C "$check_dir" verify-commit HEAD
 
 最后一条应显示 `Good "git" signature` 和你的个人邮箱。若 SSH 认证成功但签名失败，按[签名配置排查步骤](operations.md#ssh-与提交签名)检查生效的签名程序和公钥。
 
-在 `~/Workspace` 下创建五个目录。`vault` 用于存放敏感文件，目录权限为 `700`。
+`chezmoi apply` 会在 `~/Workspace` 下创建下表中的五个目录，并将 `vault` 的权限设为 `700`。在新终端里用 `w1` 进入项目目录。
 
 ```zsh
-mkdir -p ~/Workspace/{projects,lab,data,archive}
-install -d -m 700 ~/Workspace/vault
 w1
 pwd
 nvim
