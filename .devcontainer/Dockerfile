@@ -2,7 +2,7 @@
 # DevContainer Workstation Dockerfile — Disposable Platform Image
 # DevSecOps Grade Platform Engineering Standard
 # ------------------------------------------------------------------------------
-FROM mcr.microsoft.com/devcontainers/base:resolute@sha256:91eff046d5c12318fc98e59258982b87ba896c467427ed8b5dab5a02107a5db7
+FROM mcr.microsoft.com/devcontainers/base:resolute@sha256:b377a08d19467bcc08180cb95098448cac31c1a8423e287ce709a9eb09e14762
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
