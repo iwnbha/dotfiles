@@ -117,6 +117,11 @@ local function breakpoint(config, buf, line, project)
 	require("dap.breakpoints").clear()
 	require("dap.breakpoints").set({}, buf, line)
 	local stopped, exited = false, nil
+	local panic_filter, cpp_filter = false, false
+	dap.listeners.after.setExceptionBreakpoints[listener] = function(_, err, _, args)
+		panic_filter = panic_filter or (not err and vim.tbl_contains(args.filters, "rust_panic"))
+		cpp_filter = cpp_filter or vim.tbl_contains(args.filters, "cpp_throw")
+	end
 	dap.listeners.after.event_stopped[listener] = function(_, body)
 		observations[#observations + 1] = { stop = body, config = config }
 		stopped = true
@@ -149,6 +154,8 @@ local function breakpoint(config, buf, line, project)
 		return exited ~= nil and dap.session() == nil
 	end)
 	assert(exited == 0, "Rust debug process failed")
+	dap.listeners.after.setExceptionBreakpoints[listener] = nil
+	assert(panic_filter and not cpp_filter, "CodeLLDB received the wrong Rust exception filters")
 end
 local ok, err = xpcall(function()
 	assert(
