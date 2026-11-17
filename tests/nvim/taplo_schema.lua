@@ -57,21 +57,24 @@ local function request(client, method, params, buf)
 	assert(not response.err, vim.inspect(response.err))
 	return response.result
 end
-local function start(name, settings)
+local function start(name, expected_schema, settings)
 	local buf = api.nvim_create_buf(false, false)
 	buffers[#buffers + 1] = buf
 	api.nvim_buf_set_name(buf, root .. "/" .. name)
 	api.nvim_buf_set_lines(buf, 0, -1, false, { 'answer = "wrong"' })
 	local doc = vim.uri_from_bufnr(buf)
+	local lsp_config = { settings = vim.deepcopy(configured.settings) }
+	if settings then
+		lsp_config.settings.evenBetterToml = vim.tbl_deep_extend("force", lsp_config.settings.evenBetterToml, settings)
+	end
+	hook({}, lsp_config)
 	local id = vim.lsp.start({
 		name = "taplo-catalog-contract",
 		cmd = { "taplo", "lsp", "stdio" },
-		-- No folders avoids Taplo's initial default catalog fetch before it
-		-- requests workspace/configuration. Project rules use an explicit file.
-		before_init = hook,
-		settings = settings
-				and vim.tbl_deep_extend("force", vim.deepcopy(configured.settings), { evenBetterToml = settings })
-			or vim.deepcopy(configured.settings),
+		-- Give both Neovim's settings notification and Taplo's configuration
+		-- request the same local catalog, including during initialization.
+		init_options = { configurationSection = "" },
+		settings = lsp_config.settings.evenBetterToml,
 		get_language_id = function()
 			return "toml"
 		end,
@@ -95,14 +98,23 @@ local function start(name, settings)
 		end),
 		"TAPLO_INITIALIZE_TIMEOUT"
 	)
-	local loaded
+	local params = { documentUri = doc }
+	local deadline = vim.uv.now() + 10000
+	local selected
+	repeat
+		local schema = request(client, "taplo/associatedSchema", params, buf).schema
+		selected = type(schema) == "table" and schema.url
+		if selected == expected_schema then
+			break
+		end
+		vim.wait(50)
+	until vim.uv.now() >= deadline
 	assert(
-		vim.wait(10000, function()
-			loaded = request(client, "taplo/listSchemas", { documentUri = doc }, buf).schemas
-			return #loaded >= #entries
-		end, 50),
-		"TAPLO_CATALOG_NOT_LOADED"
+		selected == expected_schema,
+		("TAPLO_SCHEMA_NOT_SELECTED: expected %s, got %s"):format(expected_schema, tostring(selected))
 	)
+	local loaded = request(client, "taplo/listSchemas", params, buf).schemas
+	assert(#loaded >= #entries, "TAPLO_CATALOG_NOT_LOADED")
 	return client, buf, doc
 end
 local function edit(buf, lines, predicate)
@@ -125,7 +137,7 @@ local ok, err = xpcall(function()
 		return all
 	end
 	vim.fn.delete(path) -- missing temporary export is safely regenerated
-	local client, buf, doc = start("catalog-probe.toml")
+	local client, buf, doc = start("catalog-probe.toml", integer_schema)
 	edit(buf, { 'answer = "not an integer"' }, function(diags)
 		for _, diagnostic in ipairs(diags) do
 			if diagnostic.message:lower():find("integer", 1, true) then
@@ -157,17 +169,26 @@ local ok, err = xpcall(function()
 	end)
 
 	local project_config = root .. "/.taplo.toml"
-	vim.fn.writefile(
-		{ "[[rule]]", 'include = ["catalog-probe.toml"]', "[rule.schema]", 'path = "' .. string_schema .. '"' },
-		project_config
-	)
+	local project_file = "project/catalog-probe.toml"
+	-- A detached server has no project root for resolving relative include globs.
+	vim.fn.writefile({
+		"[[rule]]",
+		"include = [" .. vim.json.encode(root .. "/" .. project_file) .. "]",
+		"[rule.schema]",
+		'path = "' .. string_schema .. '"',
+	}, project_config)
 	local project_client, project_buf =
-		start("project/catalog-probe.toml", { taplo = { configFile = { path = project_config } } })
+		start(project_file, string_schema, { taplo = { configFile = { path = project_config } } })
 	edit(project_buf, { 'answer = "project rule wins"' }, function(diags)
 		return #diags == 0
 	end)
 	edit(project_buf, { "answer = 7" }, function(diags)
-		return #diags > 0
+		for _, diagnostic in ipairs(diags) do
+			if diagnostic.message:find('is not of type "string"', 1, true) then
+				return true
+			end
+		end
+		return false
 	end)
 	assert(project_client.initialized)
 end, debug.traceback)
