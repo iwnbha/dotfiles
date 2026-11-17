@@ -38,6 +38,25 @@ CONSUMER_HOME="$TEST_ROOT/home"
 CONSUMER_WORKTREE="$TEST_ROOT/working-tree"
 SANITIZED_PATH="$FIXTURE_BIN:/usr/bin:/bin"
 
+# A fresh personal Mac gets the global instructions. Codex owns the other files.
+codex_home="$TEST_ROOT/codex-home"
+mkdir -p "$codex_home"
+codex_chezmoi=(chezmoi --source "$REPO_ROOT" --destination "$codex_home"
+    --persistent-state "$TEST_ROOT/codex-state.boltdb" --no-tty)
+"${codex_chezmoi[@]}" --override-data "$MACOS_ARM_DATA" apply "$codex_home/.codex"
+cmp "$REPO_ROOT/home/private_dot_codex/private_AGENTS.md" "$codex_home/.codex/AGENTS.md"
+[[ -n "$(find "$codex_home/.codex/AGENTS.md" -prune -perm 0600 -print)" ]]
+printf 'existing setting\n' >"$codex_home/.codex/config.toml"
+"${codex_chezmoi[@]}" --override-data "$MACOS_ARM_DATA" apply "$codex_home/.codex"
+[[ "$(cat "$codex_home/.codex/config.toml")" == 'existing setting' ]]
+for profile_data in "$LINUX_DATA" '{"is_mac":true,"machine_profile":"devcontainer"}'; do
+    managed=$("${codex_chezmoi[@]}" --override-data "$profile_data" managed --path-style relative)
+    if grep -Eq '^\.codex(/|$)' <<<"$managed"; then
+        echo 'Mac workstation Codex guidance leaked into another profile' >&2
+        exit 1
+    fi
+done
+
 render_linux_script() {
     local template="$1" output="$2"
     chezmoi execute-template --source="$REPO_ROOT" --override-data "$LINUX_DATA" \

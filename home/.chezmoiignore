@@ -5,6 +5,7 @@
 scratch/
 
 {{ if not (and .is_mac (eq .machine_profile "workstation")) -}}
+.codex
 .local/bin/git-ssh-sign-proton
 {{ end -}}
 

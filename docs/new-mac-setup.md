@@ -116,6 +116,18 @@ nvim
 
 让 Neovim 完成首次插件安装，即可使用仓库配色。个人项目按需 clone 到 `~/Workspace/projects`。
 
+### 验证 Codex 全局说明
+
+macOS 工作站执行第 4 步的 `chezmoi apply` 时会创建 `~/.codex/AGENTS.md`，权限为 `600`。安装 Codex 后，在任意本地项目新开会话即可加载这份说明。项目自己的 `AGENTS.md` 仍可补充或覆盖全局约定。
+
+```sh
+chezmoi source-path ~/.codex/AGENTS.md
+stat -f '%Sp %N' ~/.codex/AGENTS.md
+chezmoi diff -- ~/.codex/AGENTS.md
+```
+
+源文件路径应以 `home/private_dot_codex/private_AGENTS.md` 结尾，权限应显示 `-rw-------`。部署内容一致时，最后一条命令没有输出。以后修改全局说明，编辑该源文件，再运行 `chezmoi apply -- ~/.codex/AGENTS.md`。
+
 ## 6. 按需设置 Chrome 自动填充
 
 ```sh
