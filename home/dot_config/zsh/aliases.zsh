@@ -9,15 +9,13 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../../.."
 
-# --- 1.5 工作区导航：保留已有快捷键，分类目录统一小写 ---
+# --- 1.5 工作区导航 ---
 alias ws="cd ~/Workspace"
-alias w1="cd ~/Workspace/vault"
-alias w2="cd ~/Workspace/projects/local-infrastructure"
-alias w3="cd ~/Workspace/projects"
-alias w4="cd ~/Workspace/lab"
-alias w5="cd ~/Workspace/projects/knowledge-base/architecture"
-alias w6="cd ~/Workspace/data"
-alias w7="cd ~/Workspace/archive"
+alias w1="cd ~/Workspace/projects"
+alias w2="cd ~/Workspace/lab"
+alias w3="cd ~/Workspace/data"
+alias w4="cd ~/Workspace/archive"
+alias w5="cd ~/Workspace/vault"
 
 # --- 2. 现代 Rust CLI 工具链映射 ---
 if command -v eza &>/dev/null; then

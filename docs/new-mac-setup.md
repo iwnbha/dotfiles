@@ -95,17 +95,28 @@ git -C "$check_dir" verify-commit HEAD
 
 最后一条应显示 `Good "git" signature` 和你的个人邮箱。若 SSH 认证成功但签名失败，按[签名配置排查步骤](operations.md#ssh-与提交签名)检查生效的签名程序和公钥。
 
-建立个人工作区并试用快捷方式：
+在 `~/Workspace` 下创建五个目录。`vault` 用于存放敏感文件，目录权限为 `700`。
 
 ```zsh
 mkdir -p ~/Workspace/{projects,lab,data,archive}
 install -d -m 700 ~/Workspace/vault
-w3
+w1
 pwd
 nvim
 ```
 
-`pwd` 应显示以 `/Workspace/projects` 结尾的路径。让 Neovim 完成首次插件安装，即可使用仓库配色。个人项目按需 clone 到 `~/Workspace/projects`。
+`pwd` 应显示以 `/Workspace/projects` 结尾的路径。
+
+| 命令 | 进入的目录 |
+| --- | --- |
+| `ws` | `~/Workspace` |
+| `w1` | `~/Workspace/projects` |
+| `w2` | `~/Workspace/lab` |
+| `w3` | `~/Workspace/data` |
+| `w4` | `~/Workspace/archive` |
+| `w5` | `~/Workspace/vault` |
+
+让 Neovim 完成首次插件安装，即可使用仓库配色。个人项目按需 clone 到 `~/Workspace/projects`。
 
 ## 6. 按需设置 Chrome 自动填充
 
