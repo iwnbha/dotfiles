@@ -63,6 +63,7 @@ cask "font-jetbrains-mono-nerd-font" if OS.mac?  # 备用 Nerd Font
 cask "font-maple-mono-nf-cn" if OS.mac?  # Nerd 图标与 CJK fallback
 cask "font-symbols-only-nerd-font" if OS.mac?  # 末级 Nerd Symbols fallback
 cask "ghostty" if OS.mac?  # macOS 终端与配置验证
+cask "google-chrome" if OS.mac?  # 个人工作站浏览器；配合 Proton Pass 扩展
 cask "orbstack" if OS.mac?  # macOS 容器与 Linux 虚拟机运行时
 cask "proton-pass" if OS.mac?  # Proton Pass 桌面密码管理器
 

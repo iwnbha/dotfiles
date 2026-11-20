@@ -79,6 +79,7 @@ WORKSTATION_CASKS = {
     "font-maple-mono-nf-cn",
     "font-symbols-only-nerd-font",
     "ghostty",
+    "google-chrome",
     "orbstack",
     "proton-pass",
 }

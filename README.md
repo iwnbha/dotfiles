@@ -30,6 +30,8 @@ MonoLisa 为用户自行安装的授权字体，字号 `17.5` 是本机显示设
 
 macOS 工作站默认用 Proton Pass 桌面应用连接 GitHub 并为 Git 提交签名。首次部署前，登录应用、启用 SSH Agent，将选定**个人身份**的签名公钥保存为 `~/.ssh/keys/git_signing.pub`。如有多把钥匙，请按指纹确认。完整步骤包含从 1Password 迁移和签名验收，见 [SSH 与提交签名](docs/operations.md#ssh-与提交签名)。
 
+日用密码管理采用 Chrome + Proton Pass。工作站部署会安装这两个应用并注册 Proton Pass 的 Chrome 扩展安装声明；首次启用、登录、关闭其他密码入口及保留旧记录的步骤见[新 Mac 密码管理配置](docs/new-mac-setup.md#6-统一使用-proton-pass-管理密码)。
+
 已有 chezmoi 时，分步检查并部署：
 
 ```bash

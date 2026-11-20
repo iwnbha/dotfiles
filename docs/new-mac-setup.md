@@ -1,6 +1,6 @@
 # 新个人 Mac 从零部署
 
-适用于全新的 Apple Silicon Mac 和个人 GitHub 账户。完成后，GitHub SSH 认证和 Git 提交签名使用 Proton Pass 中的个人密钥，新终端会加载工作区快捷方式，Neovim 会加载仓库配色。所有命令都在**新 Mac** 上运行。
+适用于全新的 Apple Silicon Mac 和个人 GitHub 账户。日常浏览器使用 Chrome，密码、通行密钥及个人 SSH 私钥由 Proton Pass 管理。完成后，GitHub SSH 认证和 Git 提交签名使用 Proton Pass 中的个人密钥，新终端会加载工作区快捷方式，Neovim 会加载仓库配色。所有命令都在**新 Mac** 上运行。
 
 ## 1. 安装命令行工具和 Homebrew
 
@@ -72,7 +72,7 @@ chezmoi diff --no-pager
 chezmoi apply
 ```
 
-这一步会安装工作站工具、部署 Shell、Ghostty、Neovim、Git 与 SSH 配置，并应用 Finder、Dock、键盘和截图等 macOS 偏好。如果部署提示 Agent 或公钥缺失，回到第 2 步，确认指纹匹配后重新运行 `chezmoi apply`。成功后**打开一个新的终端窗口**，在新窗口完成下面的检查。[部署范围与维护手册](operations.md#初始化)
+这一步会安装工作站工具（包括 Chrome 和 Proton Pass），部署 Shell、Ghostty、Neovim、Git 与 SSH 配置，并应用 Finder、Dock、键盘和截图等 macOS 偏好。还会写入 Chrome 的 Proton Pass 扩展安装声明；首次启用、登录和密码管理开关按第 6 步完成。如果部署提示 Agent 或公钥缺失，回到第 2 步，确认指纹匹配后重新运行 `chezmoi apply`。成功后**打开一个新的终端窗口**，在新窗口完成下面的检查。[部署范围与维护手册](operations.md#初始化)
 
 ## 5. 验证 GitHub、默认签名和日用配置
 
@@ -128,13 +128,52 @@ chezmoi diff -- ~/.codex/AGENTS.md
 
 源文件路径应以 `home/private_dot_codex/private_AGENTS.md` 结尾，权限应显示 `-rw-------`。部署内容一致时，最后一条命令没有输出。以后修改全局说明，编辑该源文件，再运行 `chezmoi apply -- ~/.codex/AGENTS.md`。
 
-## 6. 按需设置 Chrome 自动填充
+## 6. 统一使用 Proton Pass 管理密码
+
+### 自动部署与首次确认
+
+macOS `workstation` 的 `chezmoi apply` 自动完成：
+
+| 项目 | 部署结果 |
+| --- | --- |
+| Chrome、Proton Pass 桌面应用 | 由 Homebrew workstation profile 安装 |
+| Proton Pass Chrome 扩展安装声明 | 创建 `~/Library/Application Support/Google/Chrome/External Extensions/ghmbeldphafepmbegfdlkpapadhbakde.json`，更新源为 Chrome Web Store |
+| Git 与 SSH | 使用第 2 步准备的 Proton SSH Agent 和公钥，按第 5 步验收 |
+
+扩展声明不包含账户或保险库数据。Chrome 启动后会读取它，但仍需要本人确认启用扩展。账户登录、解锁、扩展内部设置、Chrome 每个配置文件的密码开关和 Apple 自动填充由下面的首次确认步骤完成；`chezmoi apply` 不会代替这些操作，也不导入或删除密码。[Chrome 外部扩展安装机制](https://developer.chrome.com/docs/extensions/how-to/distribute/install-extensions)
+
+1. 打开 Chrome，在 `chrome://extensions` 确认启用 **Proton Pass**，发布者为 **Proton AG**，扩展 ID 为 `ghmbeldphafepmbegfdlkpapadhbakde`。若 Chrome 已在运行，保存工作后退出并重新打开。若未出现安装提示，或此前曾拒绝/移除此扩展，直接从 [Proton Pass 官方商店页面](https://chromewebstore.google.com/detail/proton-pass-free-password/ghmbeldphafepmbegfdlkpapadhbakde) 安装。[Proton 安装说明](https://proton.me/support/pass-setup)
+2. 在扩展中登录与桌面应用相同的个人 Proton 账户，确认保险库同步完成，将扩展固定到工具栏。桌面应用已登录不代表 Chrome 扩展已经登录。
+3. 打开 **Proton Pass 扩展 → Settings → General**，确认以下开关开启：
+
+   | 开关 | 用途 |
+   | --- | --- |
+   | Use Proton Pass as your browser's default password manager | 由 Proton 接管浏览器密码保存入口 |
+   | Login autofill | 填充登录信息 |
+   | Prompt for auto-save | 提示保存或更新密码 |
+   | Save passkeys | 将新通行密钥保存到 Proton |
+   | Authenticate with passkeys | 使用 Proton 中的通行密钥认证 |
+
+4. 打开 `chrome://password-manager/settings`，确认「提供保存密码和通行密钥」「自动登录」「自动创建通行密钥（Automatically create a passkey to sign in faster）」均关闭。第一项可能显示由 Proton Pass 扩展控制。旧版本没有第三项时，更新 Chrome 后再确认。每个日用 Chrome 配置文件都检查一次。[Chrome 密码设置说明](https://support.google.com/chrome/answer/95606)
+5. 在 `chrome://extensions` 停用已安装的 **iCloud Passwords** 及其他密码管理扩展，保留 Proton Pass 作为日用入口。
+6. 打开 **系统设置 → 通用 → 自动填充与密码（AutoFill & Passwords）**，关闭 **自动填充密码和通行密钥（AutoFill Passwords and Passkeys）**。macOS 系统钥匙串继续用于系统和应用凭据；这一步不删除 Apple Passwords 中的记录，也不关闭 iCloud 或系统钥匙串。此配置以 Chrome 为日用浏览器；日后使用 Safari 时需另外配置其填充方式。
+
+### 已有记录：先核对，保留旧副本
+
+新 Mac 登录 Google 账户后可能同步回旧记录。先在 Proton 中按网站、用户名和密码逐条核对；完整一致的记录无需重复导入。仅迁入缺失项，密码不同的同名条目先核实，不覆盖已有记录。
+
+确需迁移时，按 [Proton 导入指南](https://proton.me/support/pass-import) 使用 Chrome 导出和 Proton 导入界面，在本机完成系统身份验证。导出的 CSV 是明文，临时放在权限为 `700` 的 `~/Workspace/vault` 下；确认导入和登录成功后删除临时导出文件。不要把 CSV、密码、通行密钥或私钥加入 dotfiles。密码 CSV 不等同于通行密钥迁移，已有通行密钥保留并按各网站支持的方式单独处理。
+
+**Chrome 和 Apple 中的原记录先保留，清理副本另行决定。** 关闭保存或自动登录不会删除旧记录，Chrome 仍可能提供已有密码供填充；保留副本期间不宣称浏览器中已没有凭据。
+
+### 验收
 
 ```sh
-brew install --cask google-chrome
+chrome_pass_manifest="$HOME/Library/Application Support/Google/Chrome/External Extensions/ghmbeldphafepmbegfdlkpapadhbakde.json"
+chezmoi diff -- "$chrome_pass_manifest"
+cat "$chrome_pass_manifest"
 ```
 
-1. 打开 Chrome，从 [Proton 官方安装指南](https://proton.me/support/pass-setup) 进入 Chrome Web Store，添加 Proton Pass 扩展，登录个人账户并固定到工具栏。
-2. 打开 **Google 密码管理器 → 设置**，关闭「提供保存密码和通行密钥」与「自动登录」。[Chrome 密码设置说明](https://support.google.com/chrome/answer/95606)
-3. 在地址栏打开 `chrome://extensions`。如果装有 iCloud Passwords，停用这个 Chrome 扩展。Safari 和其他 Apple 应用可以继续使用 Apple Passwords。
-4. 打开一个在 Proton Pass 中已有登录记录的网站，确认扩展能填充。下次注册新账户时，确认由 Proton 生成并保存新密码。已有 Apple、Google 密码及 Passkey 可以先保留。
+第一条应无差异，第二条只显示 Chrome Web Store 更新地址。它只证明安装声明已部署；继续在 `chrome://extensions` 确认扩展已启用并登录，重新打开扩展设置核对开关。打开已有登录记录的网站，确认 Proton 能填充；下次注册或更新密码、创建通行密钥时，确认保存目标是 Proton。最后重做第 5 步的 SSH 和签名检查。
+
+2026-11-20 的本机核对中，4 条 Chrome 密码记录均在 Proton 中存在完整副本，Chrome 原记录保留。这个数量仅作为本次迁移记录，新 Mac 按同步后的实际条目核对。

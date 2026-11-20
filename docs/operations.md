@@ -551,6 +551,26 @@ git rebase origin/main
 | `devdoctor` | 只读检查配置、Runtime 来源、签名和关键工具 |
 | `scan-secrets` | 使用 gitleaks 扫描暂存内容 |
 
+## 日用密码管理
+
+个人 macOS 工作站使用 **Chrome + Proton Pass**。`brew/ownership.toml` 声明应用安装，`home/private_Library/Application Support/private_Google/private_Chrome/private_External Extensions/private_ghmbeldphafepmbegfdlkpapadhbakde.json` 声明 Chrome Web Store 扩展安装来源。这些项仅部署到 macOS `workstation`；Linux 和 Dev Container 不安装 Chrome，也不接收该声明。
+
+新 Mac 的首次启用、账户登录、扩展默认管理器开关、Chrome 的三个密码开关、Apple 自动填充关闭和旧记录核对，按[新 Mac 密码管理配置](new-mac-setup.md#6-统一使用-proton-pass-管理密码)执行。浏览器配置文件、扩展存储、保险库及凭据数据库不纳入 chezmoi。同步回来的旧密码先在 Proton 核对，迁移后保留原副本；删除副本是单独操作。
+
+只更新扩展安装声明时，使用目标路径定向预览和应用：
+
+```sh
+chrome_pass_manifest="$HOME/Library/Application Support/Google/Chrome/External Extensions/ghmbeldphafepmbegfdlkpapadhbakde.json"
+chezmoi diff -- "$chrome_pass_manifest"
+chezmoi apply -- "$chrome_pass_manifest"
+```
+
+这不会自动启用或登录扩展，也不会重启 Chrome。若曾手动删除受管声明，chezmoi 会要求确认后才恢复文件。Chrome 下次启动后按提示确认；此前拒绝或移除过扩展时，从指南中的官方商店链接手动安装。
+
+恢复其他密码管理方案时，先编辑源仓库移除这个安装声明，并从 Brew ownership 移除不再需要的应用、重新生成 Brewfile；再处理本机的同名声明和扩展。Chrome 可能随外部安装声明的移除卸载对应扩展，操作前确认 Proton 保险库已同步且能从桌面端访问。仅从 Brewfile 移除条目不会自动卸载应用。Chrome 和 Apple 自动填充开关在各自设置界面恢复，旧登录记录无需从 dotfiles 恢复。
+
+CI 验证扩展声明的 profile 范围、重复部署、删除后重建，以及保留已有 Chrome Preferences、Login Data 和其他扩展文件；首次下载、启用、登录与网页填充需要在真实 Mac 验收。
+
 ## SSH 与提交签名
 
 | 环境 | SSH 与 Git 行为 |

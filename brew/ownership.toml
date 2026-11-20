@@ -474,6 +474,14 @@ description = "Proton Pass 桌面密码管理器"
 
 [[tools]]
 kind = "cask"
+name = "google-chrome"
+owner = "workstation"
+profiles = ["workstation"]
+conditions = { workstation = "mac" }
+description = "个人工作站浏览器；配合 Proton Pass 扩展"
+
+[[tools]]
+kind = "cask"
 name = "orbstack"
 owner = "workstation"
 profiles = ["workstation"]
