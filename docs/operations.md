@@ -245,6 +245,8 @@ diff -u "$candidate/baseline-lock.json" "$candidate/config/nvim/lazy-lock.json"
 
 下载与 smoke 成功不等于完整 CI 或交互验收。确认体验后，在独立维护分支审核并手动复制候选锁到 `$(chezmoi source-path)/dot_config/nvim/lazy-lock.json`，提交 PR，等待 Locked Cold Start/Lifecycle 等实际门禁。合并后才单独授权定向部署并用 `:Lazy restore` 恢复新锁；不自动搬运候选 Mason 安装。如需更新日用 Mason，另行显式执行 `:MasonToolsUpdateSync` 并验收。放弃候选只需退出其 Neovim，普通入口无需回滚。
 
+若锁文件更新了 LazyVim、mason-lspconfig.nvim 或 nvim-lspconfig，先在候选环境运行 `tests/nvim/python_provider_ownership.sh`，确认 Ty 主服务、Ruff 辅助服务及停用的 Pyright 仍符合既有行为要求；再同步 `tests/nvim/python_provider_ownership_manifest.lua` 中对应的 `locked_plugins` 提交指纹，并运行 `python_provider_ownership_contract.lua`。这些指纹记录已验证的依赖版本，不能通过删除一致性断言或修改语义高亮预期来消除版本更新失败。维护工作流还需确认更新后 `lazy-lock.json` 无新增差异。
+
 ### 工具归属与验证边界
 
 工具 owner 与安装目标是两个维度：每个工具在 `ownership.toml` 中只有一个 owner，但可以进入多个 profile。`core`、`quality` 和 `devcontainer` 均由 Ubuntu CI 真实安装并执行命令探针；macOS CI 还真实安装并验证 Ghostty 与公开字体。完整 `workstation` 中的 Proton Pass、OrbStack、GUI、字体和手工安装的授权 MonoLisa 保留真实主机验证边界，不在无交互 runner 上伪装成已验证。

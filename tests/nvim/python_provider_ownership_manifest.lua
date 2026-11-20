@@ -9,9 +9,9 @@ return {
 		pyright = "installed rollback asset; explicitly disabled",
 	},
 	locked_plugins = {
-		LazyVim = "999700997f72227187d49d8b92667183dc7fc809",
-		["mason-lspconfig.nvim"] = "e17625cdc8c2650787467398e02c5d63a2cde966",
-		["nvim-lspconfig"] = "6d27c288ff951e1e94cb5f91c800adeddf0dc0c2",
+		LazyVim = "0fa4a847929fc6beae40a3063615a58115678c34",
+		["mason-lspconfig.nvim"] = "761d376b5fbe6b21f659432ffadc1205c660176c",
+		["nvim-lspconfig"] = "4648fd8ba5c678d7e2db75ae44ffac269bb589d8",
 	},
 	packages = {
 		pyright = { executable = "pyright", lspconfig_server = "pyright" },
