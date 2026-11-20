@@ -49,10 +49,35 @@ cmp "$REPO_ROOT/home/private_dot_codex/private_AGENTS.md" "$codex_home/.codex/AG
 printf 'existing setting\n' >"$codex_home/.codex/config.toml"
 "${codex_chezmoi[@]}" --override-data "$MACOS_ARM_DATA" apply "$codex_home/.codex"
 [[ "$(cat "$codex_home/.codex/config.toml")" == 'existing setting' ]]
+
+# Register the store extension without owning browser profiles or other extensions.
+chrome_dir="$codex_home/Library/Application Support/Google/Chrome"
+extension_dir="$chrome_dir/External Extensions"
+pass_manifest="$extension_dir/ghmbeldphafepmbegfdlkpapadhbakde.json"
+mkdir -p "$chrome_dir/Default" "$extension_dir"
+printf 'existing browser preferences\n' >"$chrome_dir/Default/Preferences"
+printf 'existing login database\n' >"$chrome_dir/Default/Login Data"
+printf 'existing extension\n' >"$extension_dir/other.json"
+for profile_data in "$MACOS_ARM_DATA" "$MACOS_INTEL_DATA"; do
+    "${codex_chezmoi[@]}" --override-data "$profile_data" apply "$codex_home/Library"
+    jq -e '. == {"external_update_url": "https://clients2.google.com/service/update2/crx"}' \
+        "$pass_manifest" >/dev/null
+    [[ -n "$(find "$pass_manifest" -prune -perm 0600 -print)" ]]
+    [[ -n "$(find "$chrome_dir" -prune -perm 0700 -print)" ]]
+    [[ "$(cat "$chrome_dir/Default/Preferences")" == 'existing browser preferences' ]]
+    [[ "$(cat "$chrome_dir/Default/Login Data")" == 'existing login database' ]]
+    [[ "$(cat "$extension_dir/other.json")" == 'existing extension' ]]
+    [[ -z "$("${codex_chezmoi[@]}" --override-data "$profile_data" status "$codex_home/Library")" ]]
+done
+rm "$pass_manifest"
+# Intentional user deletion is a chezmoi conflict; explicitly consent in this fixture.
+"${codex_chezmoi[@]}" --override-data "$MACOS_ARM_DATA" apply --force "$pass_manifest"
+[[ -f "$pass_manifest" ]]
+
 for profile_data in "$LINUX_DATA" '{"is_mac":true,"machine_profile":"devcontainer"}'; do
     managed=$("${codex_chezmoi[@]}" --override-data "$profile_data" managed --path-style relative)
-    if grep -Eq '^\.codex(/|$)' <<<"$managed"; then
-        echo 'Mac workstation Codex guidance leaked into another profile' >&2
+    if grep -Eq '^(\.codex|Library)(/|$)' <<<"$managed"; then
+        echo 'Mac workstation Codex or Chrome configuration leaked into another profile' >&2
         exit 1
     fi
 done
